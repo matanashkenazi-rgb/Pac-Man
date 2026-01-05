@@ -10,11 +10,58 @@ LEVEL_MAP = [
 
 
 
+class Coin:
+    def __init__(self, x, y):
+        self.center_x = x
+        self.center_y = y
+        self.value = 10
+    
+
+class Wall:
+    def __init__(self, x, y):
+        self.center_x = x
+        self.center_y = y
 
 
+class Character:
+    # allow default speed and direction so callers can use Character(x, y)
+    def __init__(self, center_x, center_y, speed=1, change_x=0, change_y=0):
+        self.center_x = center_x
+        self.center_y = center_y
+        self.speed = speed
+        # use passed direction values instead of always setting zero
+        self.change_x = change_x
+        self.change_y = change_y
 
+class Player(Character):
+    # accept defaults for speed, change_x/change_y, score and lives
+    def __init__(self, center_x, center_y, speed=1, change_x=0, change_y=0, score=0, lives=3):
+        super().__init__(center_x, center_y, speed, change_x, change_y)
+        self.score = score
+        self.lives = lives
 
+    def move(self):
+        self.center_x += self.change_x * self.speed
+        self.center_y += self.change_y * self.speed
 
+class Enemy(Character):
+    # accept defaults so Enemy(x, y) works
+    def __init__(self, center_x, center_y, speed=1, change_x=0, change_y=0, time_to_change_direction=None):
+        super().__init__(center_x, center_y, speed, change_x, change_y)
+        self.time_to_change_direction = time_to_change_direction if time_to_change_direction is not None else 0
+    
+    def pick_new_direction(self):
+        import random
+
+        directions = [
+            (1, 0),   
+            (-1, 0),  
+            (0, 1),   
+            (0, -1),  
+            (0, 0)    
+        ]
+        self.change_x, self.change_y = random.choice(directions)
+    
 
 
 
@@ -154,6 +201,7 @@ class ConsolePacmanGame:
     def move_ghosts(self):
         """תזוזת רוחות רנדומלית (צעד אחד בכל תור)."""
         for ghost in self.ghosts:
+            import random
             # לפעמים מחליפים כיוון
             if random.random() < 0.3 or (ghost.change_x == 0 and ghost.change_y == 0):
                 ghost.pick_new_direction()
