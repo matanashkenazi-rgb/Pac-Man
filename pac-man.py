@@ -1,3 +1,80 @@
+import random
+
+class Character:
+    """מחלקת בסיס לדמויות (פקמן, רוחות)."""
+
+    def __init__(self, speed, x, y):
+        self.speed = speed
+
+        self.center_x = x
+        self.center_y = y
+
+        self.change_x = 0
+        self.change_y = 0
+
+
+class Player(Character):
+    """פקמן – השחקן."""
+
+    def __init__(self, x, y):
+        super().__init__(speed=2.5, x=x, y=y)
+
+        self.lives = 3
+        self.score = 0
+
+    def move(self):
+        self.center_x += self.change_x * self.speed
+        self.center_y += self.change_y * self.speed
+
+
+class Enemy(Character):
+    """רוח שנעה בצורה רנדומלית."""
+
+    def __init__(self, x, y):
+        super().__init__(speed=2.0, x=x, y=y)
+
+        # כל כמה זמן מחליפים כיוון
+        self.time_to_change_direction = 0.0
+
+    def pick_new_direction(self):
+        """בחירת כיוון חדש רנדומלי."""
+        directions = [
+            (1, 0),   # ימין
+            (-1, 0),  # שמאל
+            (0, 1),   # למעלה
+            (0, -1),  # למטה
+            (0, 0),   # לעמוד
+        ]
+        self.change_x, self.change_y = random.choice(directions)
+        self.time_to_change_direction = random.uniform(0.3, 1.0)
+
+    def update(self, delta_time=1/60):
+        """עדכון תנועת הרוח."""
+        self.time_to_change_direction -= delta_time
+
+        if self.time_to_change_direction <= 0:
+            self.pick_new_direction()
+
+        self.center_x += self.change_x * self.speed
+        self.center_y += self.change_y * self.speed
+
+
+class Coin:
+    """מטבע לאיסוף."""
+
+    def __init__(self, x, y, value=10):
+        self.center_x = x
+        self.center_y = y
+        self.value = value
+
+
+class Wall:
+    """קיר – חוסם תנועה."""
+
+    def __init__(self, x, y):
+        self.center_x = x
+        self.center_y = y
+
 # מפה לדוגמה: # = קיר, . = מטבע, P = פקמן, G = רוח, רווח = כלום
 LEVEL_MAP = [
     "###########",
@@ -5,18 +82,6 @@ LEVEL_MAP = [
     "#.........#",
     "###########",
 ]
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class ConsolePacmanGame:
