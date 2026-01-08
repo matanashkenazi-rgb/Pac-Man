@@ -1,5 +1,5 @@
 import random
-
+import time
 # מפה לדוגמה: # = קיר, . = מטבע, P = פקמן, G = רוח, רווח = כלום
 from adodbapi.ado_consts import directions
 
@@ -51,10 +51,20 @@ class Enemy(Character):
         self.y_change = kivoonim[random_index][1]
         self.direction_change_to_time = random.uniform(0.3, 1.0)
 
-        
+    def update(self, deltat_time):
+        while self.direction_change_to_time > 0:
+            time.sleep(deltat_time)
+            self.direction_change_to_time -= deltat_time
+        self.pick_new_direction()
 
+        self.center_x = self.x_change * self.speed
+        self.center_y = self.y_change * self.speed
 
+class Wall:
 
+    def __init__(self, center_x, center_y):
+        self.center_x = center_x
+        self.center_y = center_y
 
 class ConsolePacmanGame:
     """משחק פקמן טקסטואלי לקונסול."""
