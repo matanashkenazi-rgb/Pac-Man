@@ -1,7 +1,10 @@
 import random
-import time
+from wall import Wall
+from enemy import Enemy
+from player import Player
+from coin import Coin
+
 # מפה לדוגמה: # = קיר, . = מטבע, P = פקמן, G = רוח, רווח = כלום
-from adodbapi.ado_consts import directions
 
 LEVEL_MAP = [
     "###########",
@@ -9,62 +12,6 @@ LEVEL_MAP = [
     "#.........#",
     "###########",
 ]
-
-class Coin:
-
-    def __init__(self, x, y):
-        self.center_x = x
-        self.center_y = y
-        self.value = 10
-
-class Character:
-
-    def __init__(self, x, y, speed):
-        self.center_x = x
-        self.center_y = y
-        self.speed = speed
-        self.x_change = 0
-        self.y_change = 0
-
-class Player(Character):
-
-    def __init__(self, x, y):
-        super().__init__(x, y, 100)
-        self.score = 0
-        self.lives = 3
-
-    def move(self):
-        self.center_x = self.change_x * self.speed
-        self.center_y = self.change_y * self.speed
-
-class Enemy(Character):
-
-    def __init__(self, x, y):
-        super().__init__(x, y, 100)
-        self.direction_change_to_time = 0
-
-    def pick_new_direction(self):
-
-        kivoonim = [(0, 1), (0, 1), (1, 0), (1, 0), (1, 1)]
-        random_index = random.randint(0, len(kivoonim))
-        self.x_change = kivoonim[random_index][0]
-        self.y_change = kivoonim[random_index][1]
-        self.direction_change_to_time = random.uniform(0.3, 1.0)
-
-    def update(self, deltat_time):
-        while self.direction_change_to_time > 0:
-            time.sleep(deltat_time)
-            self.direction_change_to_time -= deltat_time
-        self.pick_new_direction()
-
-        self.center_x = self.x_change * self.speed
-        self.center_y = self.y_change * self.speed
-
-class Wall:
-
-    def __init__(self, center_x, center_y):
-        self.center_x = center_x
-        self.center_y = center_y
 
 class ConsolePacmanGame:
     """משחק פקמן טקסטואלי לקונסול."""
