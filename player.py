@@ -8,5 +8,5 @@ class Player(Character):
         self.lives = 3
 
     def move(self):
-        self.center_x = self.x_change * self.speed
-        self.center_y = self.y_change * self.speed
+        self.center_x = self.change_y * self.speed
+        self.center_y = self.change_y * self.speed
