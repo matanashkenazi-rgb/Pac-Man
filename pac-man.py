@@ -1,3 +1,9 @@
+import random
+from wall import Wall
+from coin import Coin
+from enemy import Enemy
+from player import Player
+
 # מפה לדוגמה: # = קיר, . = מטבע, P = פקמן, G = רוח, רווח = כלום
 LEVEL_MAP = [
     "###########",
@@ -5,18 +11,6 @@ LEVEL_MAP = [
     "#.........#",
     "###########",
 ]
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class ConsolePacmanGame:
