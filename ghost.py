@@ -1,12 +1,22 @@
-from character import Character
+import arcade
 import random
 import time
+import arcade
 
-class Enemy(Character):
+TILE_SIZE = 32
+
+class Ghost(arcade.Sprite):
 
     def __init__(self, x, y):
-        super().__init__(x, y, 100)
+        super().__init__()
         self.direction_change_to_time = 0
+
+        # sprite properties
+        self.texture = arcade.make_circle_texture(TILE_SIZE - 2, arcade.color.RED)
+        self.change_x = x
+        self.change_y = y
+        self.width = self.texture.width
+        self.height = self.texture.height
 
     def pick_new_direction(self):
 
