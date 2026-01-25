@@ -14,6 +14,9 @@ LEVEL_MAP = [
     "###########",
 ]
 
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+WINDOW_TITLE = "Pacman - Arcade"
 TILE_SIZE = 32
 
 class PacmanGame(arcade.View):
@@ -42,17 +45,16 @@ class PacmanGame(arcade.View):
 
                 x = col_idx * TILE_SIZE + TILE_SIZE / 2
                 y = (len(LEVEL_MAP) - row_idx - 1) * TILE_SIZE + TILE_SIZE / 2
-                current_object = LEVEL_MAP[row_idx][col_idx]
 
-                if current_object is Coin:
+                if cell == ".":
                     current_object = Coin(x, y)
                     self.coin_list.append(current_object)
 
-                elif current_object is Ghost:
+                elif cell == "G":
                     current_object = Ghost(x, y)
                     self.ghost_list.append(current_object)
 
-                elif current_object is Pacman:
+                elif cell == "P":
                     current_object = Pacman(x, y)
                     self.player_list.append(current_object)
 
@@ -62,7 +64,17 @@ class PacmanGame(arcade.View):
                     self.wall_list.append(current_object)
 
     def on_draw(self):
+
+        self.clear()
+        arcade.set_background_color(arcade.color.BLACK)
+
         self.wall_list.draw()
         self.coin_list.draw()
         self.ghost_list.draw()
         self.player_list.draw()
+
+        arcade.draw_text("Score: 0",TILE_SIZE, WINDOW_HEIGHT - 20, arcade.color.WHITE)
+        arcade.draw_text("Lives: 3", TILE_SIZE, WINDOW_HEIGHT - 60,arcade.color.WHITE)
+
+        if self.game_over:
+            arcade.draw_text("GAME OVER", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.RED)
