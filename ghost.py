@@ -12,6 +12,7 @@ class Ghost(arcade.Sprite):
         self.height = self.texture.height
         self.center_x = x
         self.center_y = y
+        self.speed = 1
         # כל כמה זמן מחליפים כיוון
         self.time_to_change_direction = 0.0
 
