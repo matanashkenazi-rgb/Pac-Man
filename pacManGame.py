@@ -78,3 +78,41 @@ class PacmanGame(arcade.View):
 
         if self.game_over:
             arcade.draw_text("GAME OVER", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.RED)
+
+    def on_update(self, delta_time):
+
+        if self.game_over:
+            return
+
+        # check collision with ghost and walls
+        old_x = self.player.center_x
+        old_y = self.player.center_y
+
+        self.player.move()
+
+        player = self.player_list[0]
+        if player.collides_with_list(self.wall_list):
+            self.player.center_x = old_x
+            self.player.center_y = old_y
+
+        # check collision with ghost and walls
+        for ghost in self.ghost_list:
+            old_x = ghost.center_x
+            old_y = ghost.center_y
+
+            ghost.update(delta_time)
+            if ghost.collides_with_list(self.wall_list):
+                ghost.center_x = old_x
+                ghost.center_y = old_y
+
+        # 4. check collision with player and coins
+        for coin in self.coin_list:
+            old_x = coin.center_x
+            old_y = coin.center_y
+
+            if coin.collides_with_list(self.player):
+                coin.center_x = old_x
+                coin.center_y = old_y
+                self.player.score += coin.value
+
+        # 5. check collision with player and ghost.
