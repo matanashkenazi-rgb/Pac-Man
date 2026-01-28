@@ -72,14 +72,14 @@ class PacmanGame(arcade.View):
             return
 
         #Pacman
-        player = self.player_list[0]
-        back_up_x = player.center_x
-        back_up_y = player.center_y
 
-        player.move()
-        if player.collides_with_list(self.wall_list):
-            player.center_x = back_up_x
-            player.center_y = back_up_y
+        back_up_x = self.player.center_x
+        back_up_y = self.player.center_y
+
+        self.player.move()
+        if self.player.collides_with_list(self.wall_list):
+            self.player.center_x = back_up_x
+            self.player.center_y = back_up_y
 
         #Ghosts
         for ghost in self.ghost_list:
@@ -91,20 +91,20 @@ class PacmanGame(arcade.View):
                 ghost.center_y = back_up_y
 
         #Coins
-        coins = arcade.check_for_collision_with_list(player, self.coin_list)
+        coins = arcade.check_for_collision_with_list(self.player, self.coin_list)
         for coin in coins:
-            player.score += coin.value
+            self.player.score += coin.value
             coin.remove_from_sprite_lists()
 
         #Hit Ghost
-        if player.collides_with_list(self.ghost_list):
-            player.lives-=1
-            player.center_x = self.start_x
-            player.center_y = self.start_y
-            player.speed = 1
+        if self.player.collides_with_list(self.ghost_list):
+            self.player.lives-=1
+            self.player.center_x = self.start_x
+            self.player.center_y = self.start_y
+            self.player.speed = 1
 
         #Check game over
-        if player.lives == 0:
+        if self.player.lives == 0:
             self.game_over = True
 
 
