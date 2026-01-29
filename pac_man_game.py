@@ -1,13 +1,21 @@
+import random
+
 import arcade
 from wall import Wall
 from coin import Coin
 from ghost import Ghost
 from pacman import Pacman
 
+COLORS = [arcade.color.RED, arcade.color.GREEN, arcade.color.BLUE, arcade.color.ORANGE, arcade.color.PURPLE, arcade.color.PINK]
 LEVEL_MAP = [
     "###########",
-    "#P....G...#",
+    "#P...#...G#",
+    "#.###.#.#.#",
+    "#...#.....#",
+    "###.#.###.#",
     "#.........#",
+    "#.###.###.#",
+    "#G.......G#",
     "###########",
 ]
 
@@ -49,7 +57,7 @@ class PacmanGame(arcade.View):
                     self.player = Pacman(x,y)
                     self.player_list.append(self.player)
                 if LEVEL_MAP[row_idx][col_idx] == "G":
-                    self.ghost_list.append(Ghost(x,y))
+                    self.ghost_list.append(Ghost(x,y, random.choice(COLORS)))
     def on_draw(self):
 
         self.clear()
