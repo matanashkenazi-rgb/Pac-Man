@@ -1,5 +1,5 @@
-from pac_man_game import PacmanGame
 import arcade
+from pac_man_game import PacmanGame
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
@@ -13,6 +13,7 @@ def main():
     game.setup()
     window.show_view(game)
     arcade.run()
+
 
 if __name__ == "__main__":
     main()
