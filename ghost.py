@@ -15,13 +15,16 @@ class Ghost(arcade.Sprite):
         self.texture = arcade.make_circle_texture(TILE_SIZE - 2, arcade.color.RED)
         self.change_x = x
         self.change_y = y
+        self.center_x = x
+        self.center_y = y
         self.width = self.texture.width
         self.height = self.texture.height
+        self.speed = 10
 
     def pick_new_direction(self):
 
         kivoonim = [(0, 1), (0, 1), (1, 0), (1, 0), (1, 1)]
-        random_index = random.randint(0, len(kivoonim))
+        random_index = random.randint(0, len(kivoonim) - 1)
         self.change_x = kivoonim[random_index][0]
         self.change_y = kivoonim[random_index][1]
         self.direction_change_to_time = random.uniform(0.3, 1.0)

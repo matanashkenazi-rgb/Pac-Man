@@ -3,7 +3,7 @@ import arcade
 from coin import Coin
 from ghost import Ghost
 from wall import Wall
-from pacman import Pacman
+from player import Pacman
 
 # מפה לדוגמה: # = קיר, . = מטבע, P = פקמן, G = רוח, רווח = כלום
 
@@ -55,11 +55,11 @@ class PacmanGame(arcade.View):
                     self.ghost_list.append(current_object)
 
                 elif cell == "P":
-                    current_object = Pacman(x, y)
-                    self.player_list.append(current_object)
+                    self.player = Pacman(x, y)
+                    self.player_list.append(self.player)
 
                 # if it is a wall
-                else:
+                elif cell == "#":
                     current_object = Wall(x, y)
                     self.wall_list.append(current_object)
 
@@ -84,14 +84,13 @@ class PacmanGame(arcade.View):
         if self.game_over:
             return
 
-        # check collision with ghost and walls
+        # check collision with player and walls
         old_x = self.player.center_x
         old_y = self.player.center_y
 
-        self.player.move()
+        self.player.update(delta_time)
 
-        player = self.player_list[0]
-        if player.collides_with_list(self.wall_list):
+        if arcade.check_for_collision_with_list(self.player, self.wall_list):
             self.player.center_x = old_x
             self.player.center_y = old_y
 
@@ -106,13 +105,43 @@ class PacmanGame(arcade.View):
                 ghost.center_y = old_y
 
         # 4. check collision with player and coins
-        for coin in self.coin_list:
-            old_x = coin.center_x
-            old_y = coin.center_y
+        coins_to_remove = arcade.check_for_collision_with_list(self.player, self.coin_list)
 
-            if coin.collides_with_list(self.player):
-                coin.center_x = old_x
-                coin.center_y = old_y
-                self.player.score += coin.value
+        for coin in coins_to_remove:
+            coin.remove_from_sprite_lists()
+            self.player.score += coin.value
 
         # 5. check collision with player and ghost.
+        for ghost in self.ghost_list:
+            old_x = ghost.center_x
+            old_y = ghost.center_y
+
+            if arcade.check_for_collision(self.player, ghost):
+                ghost.center_x = old_x
+                ghost.center_y = old_y
+                self.player.lives -= 1
+
+    def on_key_press(self, key, modifiers):
+
+        if key == arcade.key.SPACE:
+            self.setup()
+
+        if key == arcade.key.UP:
+            self.player.change_y = 1
+
+        if key == arcade.key.DOWN:
+            self.player.change_y = -1
+
+        if key == arcade.key.LEFT:
+            self.player.change_x = -1
+
+        if key == arcade.key.RIGHT:
+            self.player.change_x = 1
+
+    def on_key_release(self, key, modifiers):
+
+        if key in (arcade.key.UP, arcade.key.DOWN):
+            self.player.change_y = 0
+
+        if key in (arcade.key.LEFT, arcade.key.RIGHT):
+            self.player.change_x = 0

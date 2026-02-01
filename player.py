@@ -7,8 +7,11 @@ class Pacman(arcade.Sprite):
     def __init__(self, x, y):
 
         super().__init__()
+        self.center_y = y
+        self.center_x = x
         self.lives = 3
         self.score = 0
+        self.speed = 10
 
         # sprite properties
         self.texture = arcade.make_circle_texture(TILE_SIZE - 2, arcade.color.YELLOW)
