@@ -8,7 +8,7 @@ class Wall(arcade.Sprite):
         super().__init__()
         
         # sprite properties
-        self.texture = arcade.make_soft_square_texture(20, arcade.color.BLUE)
+        self.texture = arcade.make_soft_square_texture(TILE_SIZE, arcade.color.BLUE)
         self.center_x = center_x
         self.center_y = center_y
         self.width = self.texture.width

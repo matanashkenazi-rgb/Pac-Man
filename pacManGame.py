@@ -5,22 +5,17 @@ from ghost import Ghost
 from wall import Wall
 from pacman import Pacman
 
-# מפה לדוגמה: # = קיר, . = מטבע, P = פקמן, G = רוח, רווח = כלום
-
-LEVEL_MAP = [
-    "###########",
-    "#P....G...#",
-    "#.........#",
-    "###########",
-]
-
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 WINDOW_TITLE = "Pacman - Arcade"
 TILE_SIZE = 32
 
-class PacmanGame(arcade.View):
 
+with open("map.txt", "r") as mapFile:
+    strMap = mapFile.read()
+    LEVEL_MAP = strMap.split("\n")
+
+class PacmanGame(arcade.View):
     def __init__(self):
         super().__init__()
         self.wall_list = arcade.SpriteList()
@@ -29,7 +24,6 @@ class PacmanGame(arcade.View):
         self.player_list = arcade.SpriteList()
         self.player = None
         self.game_over = False
-        self.background_color = arcade.color.BLACK
         self.start_x = 0
         self.start_y = 0
 
@@ -39,49 +33,41 @@ class PacmanGame(arcade.View):
         self.coin_list = arcade.SpriteList()
         self.ghost_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
+        self.game_over = False
 
         for row_idx, row in enumerate(LEVEL_MAP):
             for col_idx, cell in enumerate(row):
-
                 x = col_idx * TILE_SIZE + TILE_SIZE / 2
                 y = (len(LEVEL_MAP) - row_idx - 1) * TILE_SIZE + TILE_SIZE / 2
 
-                if cell == ".":
-                    current_object = Coin(x, y)
-                    self.coin_list.append(current_object)
-
+                if cell == "#":
+                    self.wall_list.append(Wall(x, y))
+                elif cell == ".":
+                    self.coin_list.append(Coin(x, y))
                 elif cell == "G":
-                    current_object = Ghost(x, y)
-                    self.ghost_list.append(current_object)
-
+                    self.ghost_list.append(Ghost(x, y))
+                    self.coin_list.append(Coin(x, y))
                 elif cell == "P":
-                    current_object = Pacman(x, y)
-                    self.player_list.append(current_object)
-
-                # if it is a wall
-                else:
-                    current_object = Wall(x, y)
-                    self.wall_list.append(current_object)
+                    self.start_x = x
+                    self.start_y = y
+                    self.player = Pacman(x, y)
+                    self.player_list.append(self.player)
 
     def on_draw(self):
-
         self.clear()
-        arcade.set_background_color(arcade.color.BLACK)
-
         self.wall_list.draw()
         self.coin_list.draw()
         self.ghost_list.draw()
         self.player_list.draw()
-
-        arcade.draw_text("Score: 0",TILE_SIZE, WINDOW_HEIGHT - 20, arcade.color.WHITE)
-        arcade.draw_text("Lives: 3", TILE_SIZE, WINDOW_HEIGHT - 60,arcade.color.WHITE)
-
+        arcade.draw_text(f"score: {self.player.score}, lives: {self.player.lives}", TILE_SIZE, WINDOW_HEIGHT - TILE_SIZE)
         if self.game_over:
-            arcade.draw_text("GAME OVER", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.RED)
+           arcade.draw_text(f"Game over. tap space to restart. ", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
 
     def on_update(self, delta_time):
 
-        if self.game_over:
+        player = self.player_list[0]
+        if player.lives == 0:
+            self.game_over = True
             return
 
         # check collision with ghost and walls
@@ -90,7 +76,6 @@ class PacmanGame(arcade.View):
 
         self.player.move()
 
-        player = self.player_list[0]
         if player.collides_with_list(self.wall_list):
             self.player.center_x = old_x
             self.player.center_y = old_y
@@ -106,13 +91,37 @@ class PacmanGame(arcade.View):
                 ghost.center_y = old_y
 
         # 4. check collision with player and coins
-        for coin in self.coin_list:
-            old_x = coin.center_x
-            old_y = coin.center_y
+        coins = arcade.check_for_collision_with_list(self.player, self.coin_list)
+        for coin in coins:
+            self.player.score += coin.value
+            coin.remove_from_sprite_lists()
 
-            if coin.collides_with_list(self.player):
-                coin.center_x = old_x
-                coin.center_y = old_y
-                self.player.score += coin.value
 
         # 5. check collision with player and ghost.
+        if player.collides_with_list(self.ghost_list):
+            self.player.center_x = self.start_x
+            self.player.center_y = self.start_y
+            player.lives -= 1
+
+    def on_key_press(self, key, modifiers):
+        if self.game_over and key == arcade.key.SPACE:
+            self.setup()
+
+        # Move
+        player = self.player_list[0]
+
+        if key == arcade.key.UP:
+            player.change_y = 1
+        elif key == arcade.key.DOWN:
+            player.change_y = -1
+        elif key == arcade.key.RIGHT:
+            player.change_x = 1
+        elif key == arcade.key.LEFT:
+            player.change_x = -1
+
+    def on_key_release(self, key, modifiers):
+        player = self.player_list[0]
+        if key == arcade.key.UP or key == arcade.key.DOWN:
+            player.change_y = 0
+        elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+            player.change_x = 0
