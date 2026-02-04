@@ -120,18 +120,21 @@ class PacmanGame(arcade.View):
         if self.game_over and key == arcade.key.SPACE:
             self.setup()
         #Move
+
+        player = self.player_list[0]
+
         if key == arcade.key.UP:
-            self.player.change_y = 1
-        if key == arcade.key.DOWN:
-            self.player.change_y = -1
-        if key == arcade.key.RIGHT:
-            self.player.change_x = 1
-        if key == arcade.key.LEFT:
-            self.player.change_x = -1
+            player.change_y = 1
+        elif key == arcade.key.DOWN:
+            player.change_y = -1
+        elif key == arcade.key.RIGHT:
+            player.change_x = 1
+        elif key == arcade.key.LEFT:
+            player.change_x = -1
 
     def on_key_release(self, key, modifiers):
-        if key == arcade.key.UP or arcade.key.DOWN:
-            self.player.change_y = 0
-
-        if key == arcade.key.RIGHT or arcade.key.LEFT:
-            self.player.change_x = 0
+        player = self.player_list[0]
+        if key == arcade.key.UP or key == arcade.key.DOWN:
+            player.change_y = 0
+        elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+            player.change_x = 0
