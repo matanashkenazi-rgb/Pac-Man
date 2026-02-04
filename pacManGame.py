@@ -3,7 +3,7 @@ import arcade
 from coin import Coin
 from ghost import Ghost
 from wall import Wall
-from pacman import Pacman
+from player import Pacman
 
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
