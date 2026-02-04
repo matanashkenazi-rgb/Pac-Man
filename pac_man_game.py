@@ -4,16 +4,18 @@ from coin import Coin
 from ghost import Ghost
 from pacman import Pacman
 
-LEVEL_MAP = [
-    "###########",
-    "#P....G...#",
-    "#.........#",
-    "###########",
-]
 
-TILE_SIZE = 32
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+with open("map.txt", "r") as map_file:
+    game_map = map_file.read()
+    LEVEL_MAP = game_map.split("\n")
+
+
+with open("general.txt", "r") as general_file:
+    general_data = general_file.read()
+    data = general_data.split("\n")
+    TILE_SIZE = int(data[1])
+    WINDOW_WIDTH = int(data[3])
+    WINDOW_HEIGHT = int(data[5])
 
 class PacmanGame(arcade.View):
     def __init__(self):
@@ -67,6 +69,9 @@ class PacmanGame(arcade.View):
 
         if self.game_over:
             arcade.draw_text("GAME OVER", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.RED)
+        if self.score == len(self.coin_list) + self.score:
+            self.gaeme_over = True
+            arcade.draw_text("YOU WIN!", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.GREEN)
 
 
 
@@ -85,12 +90,7 @@ class PacmanGame(arcade.View):
             self.player.center_x = temperary_x
             self.player.center_y = temperary_y
         
-        for i in self.ghost_list:
-            T_x = i.center_x
-            T_y = i.center_y
-            if arcade.check_for_collision_with_list(i, self.wall_list):
-                i.center_x = T_x
-                i.center_y = T_y
+
                 
         #coin collision
         coins_hit = arcade.check_for_collision_with_list(self.player, self.coin_list)
@@ -107,6 +107,20 @@ class PacmanGame(arcade.View):
             self.player.center_y = self.start_y
         if self.lives <= 0:
             self.game_over = True
+
+        #gohst movement 
+        for ghost in self.ghost_list:
+            temp_x = ghost.center_x
+            temp_y = ghost.center_y
+            ghost.update()
+
+            #wall collision
+            if arcade.check_for_collision_with_list(ghost, self.wall_list):
+                ghost.center_x = temp_x
+                ghost.center_y = temp_y
+
+
+            
         
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:

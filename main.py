@@ -1,8 +1,11 @@
 import arcade
 from pac_man_game import PacmanGame
 
-WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 600
+with open("general.txt", "r") as general_file:
+    general_data = general_file.read()
+    data = general_data.split("\n")
+    WINDOW_WIDTH = int(data[3])
+    WINDOW_HEIGHT = int(data[5])
 
 def main():
 
