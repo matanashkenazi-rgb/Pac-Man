@@ -4,20 +4,32 @@ import arcade
 from wall import Wall
 from coin import Coin
 from ghost import Ghost
+from portal import Portal
 from pacman import Pacman
 
 COLORS = [arcade.color.RED, arcade.color.GREEN, arcade.color.BLUE, arcade.color.ORANGE, arcade.color.PURPLE, arcade.color.PINK]
-LEVEL_MAP = [
-    "###########",
-    "#P...#...G#",
-    "#.###.#.#.#",
-    "#...#.....#",
-    "###.#.###.#",
-    "#.........#",
-    "#.###.###.#",
-    "#G.......G#",
-    "###########",
-]
+# LEVEL_MAP = [
+#     "###########",
+#     "#P...#...G#",
+#     "#.###.#.#.#",
+#     "#...#.....#",
+#     "###.#.###.#",
+#     "#.........#",
+#     "#.###.###.#",
+#     "#G.......G#",
+#     "###########",
+# ]
+
+with open("maps.txt", "r") as map_file:
+    print(type(map_file))
+    maps_string = map_file.read()
+    maps_list = maps_string.split("matan")
+
+    map_string = random.choice(maps_list)
+    map_lst = map_string.split("\n")
+
+
+LEVEL_MAP = map_lst
 
 TILE_SIZE = 32
 WINDOW_WIDTH = 800
@@ -30,17 +42,20 @@ class PacmanGame(arcade.View):
         self.coin_list = arcade.SpriteList()
         self.ghost_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
+        self.portal_list = arcade.SpriteList()
         self.player = None
         self.game_over = False
         self.background_color = arcade.color.BLACK
         self.start_x = 0
         self.start_y = 0
+        self.portal_rest = 0
 
     def setup(self):
         self.wall_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
         self.ghost_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
+        self.portal_list = arcade.SpriteList()
         self.game_over = False
         for row_idx, row in enumerate(LEVEL_MAP):
             for col_idx, cell in enumerate(row):
@@ -58,6 +73,12 @@ class PacmanGame(arcade.View):
                     self.player_list.append(self.player)
                 if LEVEL_MAP[row_idx][col_idx] == "G":
                     self.ghost_list.append(Ghost(x,y, random.choice(COLORS)))
+                    self.coin_list.append(Coin(x,y))
+                if LEVEL_MAP[row_idx][col_idx] == "T":
+                    self.portal_list.append(Portal(x, y))
+
+
+
     def on_draw(self):
 
         self.clear()
@@ -67,9 +88,10 @@ class PacmanGame(arcade.View):
         self.coin_list.draw()
         self.ghost_list.draw()
         self.player_list.draw()
+        self.portal_list.draw()
 
-        arcade.draw_text(f"Score: {self.player.score}",TILE_SIZE, WINDOW_HEIGHT - 20, arcade.color.WHITE)
-        arcade.draw_text(f"Lives: {self.player.lives}", TILE_SIZE, WINDOW_HEIGHT - 60,arcade.color.WHITE)
+        arcade.draw_text(f"Score: {self.player.score}",TILE_SIZE, WINDOW_HEIGHT - TILE_SIZE, arcade.color.WHITE)
+        arcade.draw_text(f"Lives: {self.player.lives}", TILE_SIZE, WINDOW_HEIGHT - TILE_SIZE*2,arcade.color.WHITE)
 
         if self.game_over:
             arcade.draw_text("GAME OVER", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.RED)
@@ -79,12 +101,27 @@ class PacmanGame(arcade.View):
         if self.game_over:
             return
 
+        self.portal_rest+=1
+
         #Pacman
 
         back_up_x = self.player.center_x
         back_up_y = self.player.center_y
 
         self.player.move()
+        if self.portal_rest > 100:
+            portals_hit = arcade.check_for_collision_with_list(self.player, self.portal_list)
+            for portal_hit in portals_hit:
+
+                other_portals = [portal for portal in self.portal_list if portal != portal_hit]
+                if not other_portals:
+                    return
+
+                target_portal = random.choice(other_portals)
+                self.player.center_x = target_portal.center_x
+                self.player.center_y = target_portal.center_y
+                self.portal_rest = 0
+
         if self.player.collides_with_list(self.wall_list):
             self.player.center_x = back_up_x
             self.player.center_y = back_up_y
