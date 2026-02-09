@@ -10,10 +10,10 @@ WINDOW_HEIGHT = 600
 WINDOW_TITLE = "Pacman - Arcade"
 TILE_SIZE = 32
 
-
 with open("map.txt", "r") as mapFile:
     strMap = mapFile.read()
-    LEVEL_MAP = strMap.split("\n")
+    LEVEL_MAP_LIST = strMap.split("dvir\n")
+    LEVEL_MAP = LEVEL_MAP_LIST[0].split("\n")
 
 class PacmanGame(arcade.View):
     def __init__(self):
@@ -26,6 +26,7 @@ class PacmanGame(arcade.View):
         self.game_over = False
         self.start_x = 0
         self.start_y = 0
+        self.current_level = 0
 
     def setup(self):
 
@@ -34,6 +35,7 @@ class PacmanGame(arcade.View):
         self.ghost_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
         self.game_over = False
+        # LEVEL_MAP = LEVEL_MAP_LIST[self.current_level].split("\n")
 
         for row_idx, row in enumerate(LEVEL_MAP):
             for col_idx, cell in enumerate(row):
@@ -65,10 +67,15 @@ class PacmanGame(arcade.View):
 
     def on_update(self, delta_time):
 
-        player = self.player_list[0]
+        player = self.player
         if player.lives == 0:
             self.game_over = True
             return
+        elif not self.coin_list:
+            self.game_over = True
+            if self.current_level > 2:
+                return
+            self.current_level += 1
 
         # check collision with ghost and walls
         old_x = self.player.center_x
@@ -108,7 +115,7 @@ class PacmanGame(arcade.View):
             self.setup()
 
         # Move
-        player = self.player_list[0]
+        player = self.player
 
         if key == arcade.key.UP:
             player.change_y = 1
@@ -120,7 +127,7 @@ class PacmanGame(arcade.View):
             player.change_x = -1
 
     def on_key_release(self, key, modifiers):
-        player = self.player_list[0]
+        player = self.player
         if key == arcade.key.UP or key == arcade.key.DOWN:
             player.change_y = 0
         elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
