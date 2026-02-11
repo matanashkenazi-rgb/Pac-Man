@@ -29,9 +29,6 @@ class PacmanGame(arcade.View):
         self.background_color = arcade.color.BLACK
         self.start_x = 0
         self.start_y = 0
-        self.lives = 3
-        self.speed = 2
-        self.score = 0
     def setup(self):
         self.wall_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
@@ -55,7 +52,6 @@ class PacmanGame(arcade.View):
                 if LEVEL_MAP[row_idx][col_idx] == "G":
                     self.ghost_list.append(Ghost(x,y))
     def on_draw(self):
-
         self.clear()
         arcade.set_background_color(arcade.color.BLACK)
 
@@ -64,13 +60,13 @@ class PacmanGame(arcade.View):
         self.ghost_list.draw()
         self.player_list.draw()
 
-        arcade.draw_text(f"score: {self.score}",TILE_SIZE, WINDOW_HEIGHT - 20, arcade.color.WHITE)
-        arcade.draw_text(f"lives: {self.lives}", TILE_SIZE, WINDOW_HEIGHT - 60,arcade.color.WHITE)
+        arcade.draw_text(f"score: {self.player.score}",TILE_SIZE, WINDOW_HEIGHT - 20, arcade.color.WHITE)
+        arcade.draw_text(f"lives: {self.player.lives}", TILE_SIZE, WINDOW_HEIGHT - 60,arcade.color.WHITE)
 
         if self.game_over:
             arcade.draw_text("GAME OVER", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.RED)
-        if self.score == len(self.coin_list) + self.score:
-            self.gaeme_over = True
+        if self.player.score == len(self.coin_list) + self.player.score:
+            self.game_over = True
             arcade.draw_text("YOU WIN!", WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, arcade.color.GREEN)
 
 
@@ -95,17 +91,17 @@ class PacmanGame(arcade.View):
         #coin collision
         coins_hit = arcade.check_for_collision_with_list(self.player, self.coin_list)
         if len(coins_hit) > 0:
-            self.score += len(coins_hit)
+            self.player.score += len(coins_hit)
         for coin in coins_hit:
             coin.remove_from_sprite_lists()
             
         #ghost collision
         ghosts_hit = arcade.check_for_collision_with_list(self.player, self.ghost_list)
         if len(ghosts_hit) > 0:
-            self.lives -= 1
+            self.player.lives -= 1
             self.player.center_x = self.start_x
             self.player.center_y = self.start_y
-        if self.lives <= 0:
+        if self.player.lives <= 0:
             self.game_over = True
 
         #gohst movement 
@@ -123,8 +119,10 @@ class PacmanGame(arcade.View):
             
         
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.SPACE:
+        if self.game_over and key == arcade.key.SPACE:
             self.setup()
+            self.player.lives = 3
+            self.player.score = 0
         if key == arcade.key.UP:
             self.player.change_y = 1
             self.player.change_x = 0
