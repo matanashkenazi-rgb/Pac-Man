@@ -10,10 +10,9 @@ WINDOW_HEIGHT = 600
 WINDOW_TITLE = "Pacman - Arcade"
 TILE_SIZE = 32
 
-
 with open("map.txt", "r") as mapFile:
     strMap = mapFile.read()
-    LEVEL_MAP = strMap.split("\n")
+    LEVEL_MAP_LIST = strMap.split("dvir\n")
 
 class PacmanGame(arcade.View):
     def __init__(self):
@@ -26,6 +25,8 @@ class PacmanGame(arcade.View):
         self.game_over = False
         self.start_x = 0
         self.start_y = 0
+        self.current_level = 0
+        self.current_map = LEVEL_MAP_LIST[self.current_level].split()
 
     def setup(self):
 
@@ -35,10 +36,10 @@ class PacmanGame(arcade.View):
         self.player_list = arcade.SpriteList()
         self.game_over = False
 
-        for row_idx, row in enumerate(LEVEL_MAP):
+        for row_idx, row in enumerate(self.current_map):
             for col_idx, cell in enumerate(row):
                 x = col_idx * TILE_SIZE + TILE_SIZE / 2
-                y = (len(LEVEL_MAP) - row_idx - 1) * TILE_SIZE + TILE_SIZE / 2
+                y = (len(self.current_map) - row_idx - 1) * TILE_SIZE + TILE_SIZE / 2
 
                 if cell == "#":
                     self.wall_list.append(Wall(x, y))
@@ -65,9 +66,19 @@ class PacmanGame(arcade.View):
 
     def on_update(self, delta_time):
 
-        player = self.player_list[0]
+        player = self.player
         if player.lives == 0:
             self.game_over = True
+            return
+        elif not self.coin_list:
+            self.current_level += 1
+
+            if self.current_level >= len(LEVEL_MAP_LIST):
+                self.game_over = True
+                return
+
+            self.current_map = LEVEL_MAP_LIST[self.current_level].strip().split("\n")
+            self.setup()
             return
 
         # check collision with ghost and walls
@@ -108,7 +119,7 @@ class PacmanGame(arcade.View):
             self.setup()
 
         # Move
-        player = self.player_list[0]
+        player = self.player
 
         if key == arcade.key.UP:
             player.change_y = 1
@@ -118,9 +129,11 @@ class PacmanGame(arcade.View):
             player.change_x = 1
         elif key == arcade.key.LEFT:
             player.change_x = -1
+        elif key == arcade.key.SPACE and self.game_over:
+            self.setup()
 
     def on_key_release(self, key, modifiers):
-        player = self.player_list[0]
+        player = self.player
         if key == arcade.key.UP or key == arcade.key.DOWN:
             player.change_y = 0
         elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
